@@ -1,0 +1,16 @@
+table {
+    width: 100%;
+    padding: 6px;
+
+}
+
+th {
+    background-color: red;
+    color: #fff;
+    padding: 6px;
+}
+
+td {
+    padding: 6px;
+
+}

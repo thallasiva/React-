@@ -1,0 +1,14 @@
+table {
+    width: 100%;
+
+}
+
+thead,th {
+    background-color: red;
+    padding: 6px;
+    color: #fff;
+}
+
+tbody,td {
+    padding: 6px;
+}
