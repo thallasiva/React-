@@ -1,8 +1,10 @@
 import { Link, useNavigate } from 'react-router-dom';
-import '../authentication/authentication.css'; 
+import '../authentication/authentication.css';
 import { useState } from 'react';
-
-const Login = () => {
+import { Api_url, SIGN_IN } from '../../services/apiservice';
+import axios from 'axios';
+const Login = () =>
+{
     const navigate = useNavigate();
 
     const loginForm = {
@@ -14,48 +16,64 @@ const Login = () => {
         password: ''
     };
 
+    const validations = {
+        email: (value) => (value ? "" : "Email is required"),
+        password: (value) => (value ? "" : "Password is required")
+    };
+
     const [formData, setFormData] = useState(loginForm);
     const [errors, setErrors] = useState(loginErrors);
 
-    const handleSubmit = (e) => {
+    const handleSubmit = (e) =>
+    {
         e.preventDefault();
 
-        // Validate both fields before submitting
-        const newErrors = { ...loginErrors };
-        handleErrors('email', formData.email, newErrors);
-        handleErrors('password', formData.password, newErrors);
+        const errorMessages = Object.keys(formData).reduce((acc, fields) =>
+        {
+            acc[fields] = validations[fields](formData[fields]);
+            return acc;
+        }, {});
 
-        if (!newErrors.email && !newErrors.password) {
-            navigate('/otp'); // Proceed to OTP page if no errors
-        } else {
-            setErrors(newErrors); // Update error state
+        setErrors(errorMessages);
+
+        if (Object.values(errorMessages).every((err) => err === ""))
+        {
+            console.log("Form submitted successfully");
+            const credentials = {
+                email: formData.email,
+                password: formData.password,
+            };
+            axios.post(`${Api_url}${SIGN_IN}`,credentials).then((resp) =>
+            {
+                console.log("response", resp);
+
+                if (resp.data.responseCode === 1)
+                {
+                    alert(resp.data.responseData)
+
+                } else
+                {
+                    localStorage.setItem("loginResponse", JSON.stringify(resp.data));
+                    navigate('/otp');
+                }
+            })
+            // handle successful form submission (e.g., navigation or API call)
         }
     };
 
-    const handleInputChange = (e) => {
+    const handleInputChange = (e) =>
+    {
         const { name, value } = e.target;
-        setFormData((prevFormData) => ({
-            ...prevFormData,
+
+        setFormData((previous) => ({
+            ...previous,
             [name]: value
         }));
-    };
 
-    const handleErrors = (name, value, newErrors) => {
-        let errorMessage = '';
-        
-        if (name === 'email') {
-            if (!value) {
-                errorMessage = 'Email is required';
-            } 
-        }
-
-        if (name === 'password') {
-            if (!value) {
-                errorMessage = 'Password is required';
-            }
-        }
-
-        newErrors[name] = errorMessage;
+        setErrors((previousErrors) => ({
+            ...previousErrors,
+            [name]: validations[name](value)
+        }));
     };
 
     return (
@@ -65,23 +83,23 @@ const Login = () => {
             <form onSubmit={handleSubmit}>
                 <div className="mb-3">
                     <label className="form-label">Email address</label>
-                    <input 
-                        type="email" 
-                        className="form-control" 
-                        name="email" 
-                        value={formData.email} 
-                        onChange={handleInputChange} 
+                    <input
+                        type="email"
+                        className="form-control"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleInputChange}
                     />
                     {errors.email && <small className="text-danger">{errors.email}</small>}
                 </div>
                 <div className="mb-3">
                     <label className="form-label">Password</label>
-                    <input 
-                        type="password" 
-                        className="form-control" 
-                        name="password" 
-                        value={formData.password} 
-                        onChange={handleInputChange} 
+                    <input
+                        type="password"
+                        className="form-control"
+                        name="password"
+                        value={formData.password}
+                        onChange={handleInputChange}
                     />
                     {errors.password && <small className="text-danger">{errors.password}</small>}
                 </div>
