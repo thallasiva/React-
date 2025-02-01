@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Api_url, REQUEST_OTP } from "../../services/apiservice";
+import { Api_url, REQUEST_OTP, VALIDATE_OTP } from "../../services/apiservice";
 import axios from "axios";
 
 
-const OTP = () =>
-{
+const OTP = () => {
 
     const navigate = useNavigate();
 
     const [getOtpDetails, setOtpData] = useState({});
+    const [logingResponse, setLoginResponse] = useState(null);
 
     const otpForm = {
         otpNumber: ''
@@ -29,62 +29,94 @@ const OTP = () =>
 
 
 
-    useEffect(() =>
-    {
+    useEffect(() => {
+        const storedLoginResponse = JSON.parse(localStorage.getItem('loginResponse'));
+        console.log("login response", storedLoginResponse);
+        setLoginResponse(storedLoginResponse);
+        // const storedLoginResponse = JSON.parse(localStorage.getItem('loginResponse'));
+        // console.log("login response", storedLoginResponse);
+        // setLoginResponse(storedLoginResponse);  // Corrected variable name here
 
-        const logingResponse = JSON.parse(localStorage.getItem('loginResponse'));
-        console.log("login response", logingResponse);
+        if (storedLoginResponse) {
+            let payload = {
+                email: storedLoginResponse.responseData.userDetails.email,
+                reqFor: "Login"
+            };
+
+            axios.post(Api_url + REQUEST_OTP, payload).then((resp) => {
+                console.log("otp request response", resp);
+
+                if (resp.responseCode === 1) {
+                    alert("invalid");
+                } else {
+                    setOtpData(resp.data.responseData)
+                }
+
+            })
+                .catch({
+                    // console.log("while submitting the error");
+                    // console.error("Error while requesting OTP", err);
+
+                });
+        }
+    }, []);
+
+    const validateOtp = () => {
+        console.log("getOtpDetails", getOtpDetails);
+
+        if (!logingResponse);
+
+        console.log("getOtpDetails", getOtpDetails);
+
 
         let payload = {
-            email: logingResponse.responseData.userDetails.email,
-            reqFor: "Login"
+            "email": logingResponse.responseData.userDetails.email,
+            "otpId": getOtpDetails.otpId,
+            "otpNumber": formDatam.otpNumber
         };
 
-        axios.post(Api_url + REQUEST_OTP, payload).then((resp) =>
-        {
-            console.log("otp request response", resp);
+        axios.post(Api_url + VALIDATE_OTP, payload).then((resp) => {
+            console.log("=========>", resp)
+            if(resp.data.responseCode === 1) {
+                alert("invalied request")
+            } else {
+                localStorage.setItem('otpValidateResponse',JSON.stringify(resp))
+                navigate('/dashboard');
 
-            if(resp.responseCode === 1) {
-                alert("invalid");
-            }else {
-                setOtpData(resp.responseData)
             }
 
-        }).catch({
-            // console.log("while submitting the error");
-        });
-
-    }, []);
+        }).catch((err) => {
+            console.error("error occured", err);
+        })
+    }
 
 
 
     // validatd otp api call
-    
 
 
-    const handleSubmit = (e) =>
-    {
+
+    const handleSubmit = (e) => {
         e.preventDefault(); // డిఫాల్ట్ ఫారం సబ్మిట్‌ను ఆపడం
 
 
-        const errorMessages = Object.keys(formDatam).reduce((acc, fields) =>
-        {
+        const errorMessages = Object.keys(formDatam).reduce((acc, fields) => {
             acc[fields] = validation[fields](formDatam[fields]);
             return acc;
         }, {});
 
         setErrors(errorMessages);
 
-        if (Object.values(errorMessages).every((err) => err === ""))
-        {
+        if (Object.values(errorMessages).every((err) => err === "")) {
             console.log("form submitd");
+
+            validateOtp();
 
         };
 
     };
 
-    const handleInputChange = (e) =>
-    {
+    const handleInputChange = (e) => {
         e.preventDefault();
 
         const { name, value } = e.target;
