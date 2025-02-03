@@ -3,8 +3,14 @@ import React, { useEffect, useState } from "react";
 import apiInstace from "../../interceptor/axiosInstance";
 import { Api_url, USERS_LIST } from "../../services/apiservice";
 import Confirmation from "../../shared/confirmation";
+import axios from "axios";
+import SuccessModal from "../../shared/success";
+import { useNavigate } from "react-router-dom";
 
 const CreateUser = () => {
+
+
+    const navigate = useNavigate();
 
     const createUserForm = {
         fname: '',
@@ -28,6 +34,7 @@ const CreateUser = () => {
 
     // confirmation modal
     const [enableConformationFlag, setConfirmationFlag] = useState(false);
+    const [confirmationMsg,setConfirmationMsg] = useState("");
     const [enableSuccessFlag, setSuccesssFlag] = useState(false);
 
 
@@ -52,7 +59,6 @@ const CreateUser = () => {
 
     useEffect(() => {
         if (loginResponse) {
-            console.log("======>", loginResponse);
             usersListApiCall();
         }
 
@@ -93,6 +99,7 @@ const CreateUser = () => {
         setErrors(errorMessage);
         if (Object.values(errorMessage).every((err) => err === "")) {
             console.log("form submitted successfully");
+            setConfirmationMsg("Are you sure want to create a new user?")
             setConfirmationFlag(true);
 
         } else {
@@ -115,13 +122,38 @@ const CreateUser = () => {
 
     const handleConfirmation = () => {
         console.log("confimation modal enabled");
-
+        createusers();
     }
 
-    //     <Confirmation
-    //     onConfirm={handleConfirmation}
-    //     onCancel={() => setConfirmationFlag(false)}
-    // />
+   const createusers =() => {
+
+    let payload = {
+        "firstName": formData.fname,
+        "lastName": formData.lname,
+        "email": formData.email,
+        "roleId": formData.role,
+        "companyName":formData.company_name,
+        "userId": loginResponse[1][0].userId
+    }
+
+    console.log("create user payload",payload);
+    
+
+    axios.post(Api_url+'/api/login/registration',payload).then((resp) => {
+        console.log("resp",resp);
+        
+        if(resp.responseCode === 0) {
+            alert("create user faild");
+        }else {
+            setConfirmationFlag(false);
+            setSuccesssFlag(true);
+        }
+    });
+   }
+
+   const handleSuccessModal = () => {
+    navigate('users/usersList');
+   }
 
 
     return (
@@ -154,15 +186,15 @@ const CreateUser = () => {
 
                     <label> Role </label>
                     {Array.isArray(userList) && userList.length > 0 ? (
-                        <select className="form-control" name="role" value={formData.role} onChange={handleInputChange}>
+                        <select className="form-control" name="role"  onChange={handleInputChange}>
                             <option value={''} disabled> Selected Role </option>
                             {userList.map(item => (
-                                <option key={item.login_id} > {item.role_name}</option>
+                                <option key={item.login_id} value={item.user_role}> {item.role_name}</option>
                             ))}
                         </select>
 
                     ) : (
-                        <p> No user foundddddd</p>
+                        <p> No user found</p>
                     )}
                 </div>
                 {errors.role && <span className="text-danger text-sm"> {errors.role}</span>}
@@ -182,9 +214,22 @@ const CreateUser = () => {
                 enableConformationFlag && (
                     <Confirmation
                         isOpen={enableConformationFlag}  // Ensure you pass the state
-
+                        confirmationMsg={confirmationMsg}
                         onConfirm={handleConfirmation}
                         onCancel={() => setConfirmationFlag(false)}
+                    />
+                )
+            }
+
+            {
+                enableSuccessFlag && (
+                    <SuccessModal
+                    isSuccessOpen={enableSuccessFlag}
+                    confirmationMsg={confirmationMsg} 
+                    onSuccess={handleSuccessModal}
+
+                    onCancel={() => setSuccesssFlag(false)}
+
                     />
                 )
             }

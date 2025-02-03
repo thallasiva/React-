@@ -2,55 +2,69 @@ import React, { useState, useEffect } from "react";
 import '../users/user.css';
 import { useNavigate } from "react-router-dom";
 import apiInstace from "../../interceptor/axiosInstance";
-import { Api_url, USERS_LIST } from "../../services/apiservice";
+import { Api_url, DELETE_USER, USERS_LIST } from "../../services/apiservice";
+import axios from "axios";
 
-const UserList = () => {
+const UserList = () =>
+{
 
     const navigate = useNavigate();
 
     const [otpValidate, setotpValidateResponse] = useState(null);
     const [userResponse, setuserRespons] = useState([]);
 
-    const doCreate = (e) => {
+    const doCreate = (e) =>
+    {
         e.preventDefault();
         navigate('/users/createUser');
     }
 
-    useEffect(() => {
+    useEffect(() =>
+    {
         const otpResp = JSON.parse(localStorage.getItem('otpValidateResponse'));
-        if (otpResp && otpResp.data && otpResp.data.responseData) {
+        if (otpResp && otpResp.data && otpResp.data.responseData)
+        {
             console.log("otpResp", otpResp);
             setotpValidateResponse(otpResp);
         }
     }, []);
 
-    useEffect(() => {
-        if (otpValidate) {
+    useEffect(() =>
+    {
+        if (otpValidate)
+        {
             getUserList();
         }
     }, [otpValidate]);
 
-    const getUserList = () => {
+    const getUserList = () =>
+    {
         let payload = {
             "REQ_ID": 6,
             "_USER_ID": otpValidate.data.responseData[1][0].userId
         }
 
-        apiInstace.post(Api_url + USERS_LIST, payload).then((resp) => {
-            if (resp.data.responseCode === 1) {
+        apiInstace.post(Api_url + USERS_LIST, payload).then((resp) =>
+        {
+            if (resp.data.responseCode === 1)
+            {
                 alert("Fetch failed");
-            } else {
+            } else
+            {
                 console.log("Response here", resp.data.responseData[1]);
                 setuserRespons(resp.data.responseData[1])
             }
 
-        }).catch(err => {
+        }).catch(err =>
+        {
             console.error("Error occurred", err);
         });
     }
 
-    const getStatusColor = (status) => {
-        switch (status) {
+    const getStatusColor = (status) =>
+    {
+        switch (status)
+        {
             case 'Active':
                 return 'activeBtn';
             case 'Invited':
@@ -63,19 +77,55 @@ const UserList = () => {
     }
 
     // Function to handle button actions (Activate, Deactivate, Delete)
-    const handleAction = (status, action) => {
-        console.log("status",status);
-        
-        if (action === 'activate') {
+    const handleAction = (status, action) =>
+    {
+        console.log("status", status);
+
+
+        if (action === 'activate')
+        {
             console.log("Activating user...");
             // Implement activation logic here
-        } else if (action === 'deactivate') {
+        } else if (action === 'deactivate')
+        {
             console.log("Deactivating user...");
             // Implement deactivation logic here
-        } else if (action === 'delete') {
+        } else if (action === 'delete')
+        {
+            deleteApi(status)
             console.log("Deleting user...");
             // Implement deletion logic here
         }
+    }
+
+    const deleteApi = (selectedOnj) =>
+    {
+        console.log("selecte obje", selectedOnj);
+
+        let payload = {
+            "REQ_ID": 7,
+            "_USER_ID": selectedOnj.User_id,
+            "_USER_STATUS": "Delete",
+            "_UPDATED_BY": otpValidate.data.responseData[1][0].userId
+        }
+
+        apiInstace.post(`${Api_url}${DELETE_USER}`, [payload]).then((resp) =>
+        {
+
+            if (resp.data.responseCode === 1)
+            {
+                alert("Invalid request")
+            } else
+            {
+                alert("user deleted successfully");
+                getUserList();
+            }
+
+        }).catch(err =>
+        {
+            console.error("error ocurred", err);
+        })
+
     }
 
     return (
@@ -102,8 +152,10 @@ const UserList = () => {
                 </thead>
                 <tbody>
                     {
-                        userResponse.map(item => {
+                        userResponse.map(item =>
+                        {
                             return (
+
                                 <tr key={item.login_id}>
                                     <td>{item.user_name}</td>
                                     <td>{item.email_id}</td>
@@ -112,18 +164,20 @@ const UserList = () => {
                                     <td>
                                         <button className={getStatusColor(item.status)}>{item.status}</button>
                                     </td>
+                                    {/* <div>{}</div> */}
+
                                     <td>
                                         {item.status === 'Active' ? (
                                             <>
                                                 <button
                                                     className="btn btn-danger me-2 rounded-pill"
-                                                    onClick={() => handleAction(item.status, 'deactivate')}
+                                                    onClick={() => handleAction(item, 'deactivate')}
                                                 >
                                                     Deactivate
                                                 </button>
                                                 <button
                                                     className="btn btn-danger rounded-pill"
-                                                    onClick={() => handleAction(item.status, 'delete')}
+                                                    onClick={() => handleAction(item, 'delete')}
                                                 >
                                                     Delete
                                                 </button>
@@ -132,13 +186,13 @@ const UserList = () => {
                                             <>
                                                 <button
                                                     className="btn btn-primary rounded-pill"
-                                                    onClick={() => handleAction(item.status, 'activate')}
+                                                    onClick={() => handleAction(item, 'activate')}
                                                 >
                                                     Activate
                                                 </button>
                                                 <button
                                                     className="btn btn-danger ms-2 rounded-pill"
-                                                    onClick={() => handleAction(item.status, 'delete')}
+                                                    onClick={() => handleAction(JSON.stringify(item), 'delete')}
                                                 >
                                                     Delete
                                                 </button>
