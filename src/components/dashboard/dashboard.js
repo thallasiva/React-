@@ -63,7 +63,7 @@ const Dashboard = () => {
                 alert("Fetching is an invalid request");
             } else {
                 console.log("Response Data:", resp.data.responseData[1]);
-                setProjectsLength(resp.data.responseData[1].length);  // Update state with length
+                setProjectsLength(resp.data.responseData[1][0].ProjectCount);  // Update state with length
             }
         }).catch(err => {
             console.error("Error occurred", err);

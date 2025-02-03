@@ -75,3 +75,14 @@ a {
 label {
   margin-top: 16px;
 }
+
+.form-control {
+  border-radius: 10px;
+  font-size: 14px;
+}
+
+label {
+  font-size: 14px;
+  font-weight: 600;
+
+}

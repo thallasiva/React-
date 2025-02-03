@@ -12,3 +12,30 @@ thead,th {
 tbody,td {
     padding: 6px;
 }
+
+.activeBtn {
+    background: green;
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    padding: 6px 16px;
+    font-size: 14px;
+}
+
+.invitedBtn {
+    background: #aaa;
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    padding: 6px 16px;
+    font-size: 14px;
+}
+
+.activatedbtn {
+    background: #bbb;
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    padding: 6px 16px;
+    font-size: 14px;
+}
