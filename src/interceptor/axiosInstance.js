@@ -38,7 +38,7 @@ apiInstace.interceptors.response.use(
             localStorage.removeItem('loginResponse');
             window.location.href = '/';  // Or use React Router to navigate
         }
-        window.location.href = '/dashboard'; 
+        window.location.href = 'dashboard'; 
         return Promise.reject(error); // Reject the promise if there's an error
     }
 );
