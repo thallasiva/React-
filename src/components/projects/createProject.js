@@ -1,16 +1,19 @@
 import React, { useEffect, useState } from "react";
-import apiInstace from "../../interceptor/axiosInstance";
 import { useNavigate } from "react-router-dom";
-import { Api_url, CREATE_PROJECT } from "../../services/apiservice";
+import apiInstace from "../../interceptor/axiosInstance";
+import { Api_url, CREATE_PROJECT, USERS_LIST } from "../../services/apiservice";
 
 const CreateProject = () => {
-
     const navigate = useNavigate();
 
-    // form validations here
+    const [modalVisible, setModalVisible] = useState(false);
+    const [getlocalStorage, setLocalstorage] = useState(null);
+    const toggleModal = () => {
+        setModalVisible(!modalVisible);
+    }
 
+    // form validations and state
     const projectCreateForm = {
-
         pname: '',
         pdesc: '',
         psdate: '',
@@ -30,41 +33,41 @@ const CreateProject = () => {
         pnote: ''
     };
 
-
     const formValidations = {
         pname: (value) => (value ? "" : "Project name is required"),
         pdesc: (value) => (value ? "" : "Project description is required"),
         psdate: (value) => (value ? "" : "Project start date is required"),
-        pedate: (value) => (value ? "" : "Project start date is required"),
-        pmarket: (value) => (value ? "" : "Project start date is required"),
-        pmethd: (value) => (value ? "" : "Project start date is required"),
+        pedate: (value) => (value ? "" : "Project end date is required"),
+        pmarket: (value) => (value ? "" : "Project market is required"),
+        pmethd: (value) => (value ? "" : "Project methodology is required"),
         pnote: (value) => (value ? "" : "")
     };
 
-    // set and get form validations
     const [formData, setFormData] = useState(projectCreateForm);
     const [getError, setErrors] = useState(projectCreateErrors);
-    const [getLocalDtrgeValues, setLocalStorage] = useState(null);
+    const [filterParams, setFilterParams] = useState([]);
 
-    useEffect(() => {
-        const otpResp = setLocalStorage(JSON.parse(localStorage.getItem('otpValidateResponse')));
-        console.log("otp response", otpResp);
-
-
-    },[]);
+    // set uses list
+    const [getUsersListResponse, setUserListResponse] = useState([]);
+    // filter userecords based on id
+    const [getActiveUser, setActiveUsers] = useState([]);
 
 
 
     useEffect(() => {
-        console.log("otp response here",getLocalDtrgeValues);
+        const otpResponse = JSON.parse(localStorage.getItem("otpValidateResponse"));
+        setLocalstorage(otpResponse.data.responseData[1][0]);
 
+    }, []);
 
-    },[getLocalDtrgeValues]);  // Fetch users and projects once otpValidate is set
+    useEffect(() => {
+        console.log("local storage response", getlocalStorage);
+        if (getlocalStorage) {
+            userslistapi();
+        }
 
+    }, [getlocalStorage])
 
-
-
-    // handle input values
     const handleInputs = (e) => {
         const { name, value } = e.target;
         setFormData((previous) => ({
@@ -72,11 +75,60 @@ const CreateProject = () => {
             [name]: value,
         }));
 
-        setErrors((preivousError) => ({
-            ...preivousError,
+        setErrors((previousError) => ({
+            ...previousError,
             [name]: formValidations[name](value)
         }));
     };
+
+    // userslist
+
+    const userslistapi = () => {
+
+        let payload = {
+            "REQ_ID": 6,
+            "_USER_ID": getlocalStorage?.userId,
+
+        }
+        apiInstace.post(Api_url + USERS_LIST, payload).then((resp) => {
+
+            console.log("users list here", resp);
+            if (resp.data.responseCode === 1) {
+                alert("fatching user list facing the issue")
+            } else {
+                let showActiveUsers = resp.data.responseData[1].filter(item => item.status === "Active");
+                console.log("Active users", showActiveUsers);
+
+                setUserListResponse(showActiveUsers)
+            }
+
+
+        }).catch(err => {
+            console.error("error occred", err);
+
+        })
+    }
+
+    // const handleCheckboxSelect = (e) => {
+    //     console.log("selected checkbox",e.target);
+
+
+    // }
+
+    const handleCheckboxSelect = (e) => {
+        let exists = filterParams.find(filter => filter === e.target.value); // Check if value already exists in the array
+        if (exists) {
+            const updatedFilters = filterParams.filter(filter => filter !== e.target.value); // Remove the item if it exists
+            setFilterParams(updatedFilters); // Update the state with the new array
+            console.log("selected checkboxs", updatedFilters)
+        } else {
+            const updatedFilters = [...filterParams, e.target.value];
+            setFilterParams(updatedFilters);
+             console.log("removed checkboxs", updatedFilters)
+
+        }
+    };
+
 
 
     const handleSubmit = (e) => {
@@ -90,8 +142,6 @@ const CreateProject = () => {
         setErrors(errorMessage);
 
         if (Object.values(errorMessage).every(err => err === "")) {
-            console.log("form submitted successfully");
-
             const payload = {
                 "ProjName": formData.pname,
                 "ProjDesc": formData.pdesc,
@@ -101,32 +151,25 @@ const CreateProject = () => {
                 "Market": formData.pmarket,
                 "Methodology": formData.pmethd,
                 "Notes": formData.pnote,
-                "userId": "27",
+                "userId": getlocalStorage?.userId,
                 "ProjUsers": []
-
-            }
+            };
 
             apiInstace.post(Api_url + CREATE_PROJECT, payload).then((resp) => {
                 if (resp.responseCode === 1) {
-                    alert("form submitting error");
+                    alert("Form submitting error");
                 } else {
-                    alert("form submitted successfully");
-                    navigate('/projects/projectsList')
+                    alert("Form submitted successfully");
+                    navigate('/projects/projectsList');
                 }
-            })
-
+            });
         } else {
-            console.error("form validation error");
-
+            console.error("Form validation error");
         }
     }
 
-
-
-
     return (
         <div className="p-4 container">
-
             <h3> Create Project </h3>
 
             <form onSubmit={handleSubmit}>
@@ -136,17 +179,18 @@ const CreateProject = () => {
                 </div>
                 {getError.pname && <span className="text-danger">{getError.pname}</span>}
 
-
                 <div className="form-group">
                     <label> Project Description </label>
                     <textarea rows={4} className="w-100" name="pdesc" value={formData.pdesc} onChange={handleInputs} />
                 </div>
                 {getError.pdesc && <span className="text-danger">{getError.pdesc}</span>}
-                <button type="button" className="btn btn-primary ms-2 btn-sm"> Assign </button>
 
-                <div className="border p-2 mt-3">
+                {/* Trigger modal on click */}
+                <button type="button" className="btn btn-primary" onClick={toggleModal}>
+                    Assign
+                </button>
 
-                </div>
+                <div className="border p-2 mt-3"></div>
 
                 <div className="row">
                     <div className="col-sm-6">
@@ -160,7 +204,6 @@ const CreateProject = () => {
                         <input type="date" className="form-control" name="pedate" value={formData.pedate} onChange={handleInputs} />
                     </div>
                     {getError.pedate && <span className="text-danger">{getError.pedate}</span>}
-
                 </div>
 
                 <div className="row">
@@ -183,7 +226,6 @@ const CreateProject = () => {
                         </select>
                     </div>
                     {getError.pmethd && <span className="text-danger">{getError.pmethd}</span>}
-
                 </div>
 
                 <div className="form-group">
@@ -196,9 +238,52 @@ const CreateProject = () => {
                     <button type="button" className="btn btn-secondary ms-2 btn-sm"> Cancel </button>
                 </div>
             </form>
-        </div>
-    )
 
+            {/* Modal */}
+            {modalVisible && (
+                <div className="modal fade show" style={{ display: "block" }} tabIndex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div className="modal-dialog modal-dialog-scrollable">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h5 className="modal-title" id="exampleModalLabel">Assign new users</h5>
+                                <button type="button" className="btn-close" onClick={toggleModal} aria-label="Close"></button>
+                            </div>
+                            <div className="modal-body">
+                                {
+                                    getUsersListResponse.map(item => (
+                                        <div className="row" >
+                                            <div className="col-sm-3">
+                                                <p className="m-0">{item.user_name}</p>
+                                                <p className="font-sm m-0 text-red smallText">{item.user_name}</p>
+                                            </div>
+                                            <div className="col-sm-6">
+                                                {item.company_name}
+                                            </div>
+                                            <div className="col-sm-2">
+                                                <input type="checkbox" id="vehicle1" name="vehicle1" value={item.login_id}
+
+                                                    onChange={(e) => handleCheckboxSelect(e)}
+                                                />
+                                            </div>
+                                            <hr />
+                                        </div>
+
+
+                                    ))
+                                }
+
+                            </div>
+                            <div className="modal-footer">
+                                <button type="button" className="btn btn-secondary" onClick={toggleModal}>Close</button>
+                                <button type="button" className="btn btn-primary">Save changes</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )
+            }
+        </div >
+    );
 };
 
 export default CreateProject;
