@@ -64,6 +64,8 @@ const CreateProject = () => {
         console.log("local storage response", getlocalStorage);
         if (getlocalStorage) {
             userslistapi();
+            getMargetandMethodlogy();
+
         }
 
     }, [getlocalStorage])
@@ -109,11 +111,24 @@ const CreateProject = () => {
         })
     }
 
-    // const handleCheckboxSelect = (e) => {
-    //     console.log("selected checkbox",e.target);
+    const getMargetandMethodlogy = () => {
+
+        let payload = {
+            "REQ_ID": 9,
+             "_USER_ID": "getlocalStorage?.userId"
+        };
+
+        apiInstace.post(Api_url+USERS_LIST,payload).then(resp => {
+            console.log("response",resp);
+            
+
+        }).catch(err => {
+            console.error("api fatch response failed",err);
+            
+        })
 
 
-    // }
+    }
 
     const handleCheckboxSelect = (e) => {
         let exists = filterParams.find(filter => filter === e.target.value); // Check if value already exists in the array
@@ -124,7 +139,7 @@ const CreateProject = () => {
         } else {
             const updatedFilters = [...filterParams, e.target.value];
             setFilterParams(updatedFilters);
-             console.log("removed checkboxs", updatedFilters)
+            console.log("removed checkboxs", updatedFilters)
 
         }
     };
