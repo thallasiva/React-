@@ -91,3 +91,26 @@ label {
   font-weight: 600;
 
 }
+
+
+.form-control {
+  border: 1px solid #ddd !important;
+}
+
+input {
+  border: 1px solid #ddd !important;
+
+}
+
+input:active {
+  border: 1px solid #ddd !important;
+
+}
+
+label {
+  font-size: 12px;
+}
+
+::placeholder {
+  font-size: 12px;
+}

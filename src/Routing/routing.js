@@ -7,6 +7,7 @@ import UserList from '../components/users/usersList';
 import CreateUser from '../components/users/createUsers';
 import ProjectList from '../components/projects/projectsList';
 import CreateProject from '../components/projects/createProject';
+import EditProject from '../components/projects/editProject';
 
 const Routing = () => {
     return (
@@ -25,6 +26,7 @@ const Routing = () => {
                     {/* projects list */}
                     <Route path='/projects/projectsList' element={<ProjectList />} />
                     <Route path='/projects/createProject' element={<CreateProject />} />
+                    <Route path="/projects/editProject"  element={<EditProject />} />
 
                 </Routes>
             </div>

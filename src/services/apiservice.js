@@ -7,4 +7,5 @@ export const USERS_LIST = '/api/project/request';
 export const PROJECTS_LIST = '/api/project/request';
 export const CREATE_USER = '/api/login/registration';
 export const DELETE_USER = '/api/project/request';
-export const CREATE_PROJECT = '/api/project/create'
+export const CREATE_PROJECT = '/api/project/create';
+export const GET_PROJECTS_LIST = '/api/project/getProjects'; 

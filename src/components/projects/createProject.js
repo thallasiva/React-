@@ -51,6 +51,9 @@ const CreateProject = () => {
     const [getUsersListResponse, setUserListResponse] = useState([]);
     // filter userecords based on id
     const [getActiveUser, setActiveUsers] = useState([]);
+    const [getMethodlogy, ssetMethodlyResponse] = useState([]);
+    const [getMarket, setMarketResponse] = useState([]);
+
 
 
 
@@ -115,16 +118,17 @@ const CreateProject = () => {
 
         let payload = {
             "REQ_ID": 9,
-             "_USER_ID": "getlocalStorage?.userId"
+            "_USER_ID": getlocalStorage?.userId
         };
 
-        apiInstace.post(Api_url+USERS_LIST,payload).then(resp => {
-            console.log("response",resp);
-            
-
+        apiInstace.post(Api_url + USERS_LIST, payload).then(resp => {
+            console.log("market_name", resp.data.responseData[1][0].market_name);
+            ssetMethodlyResponse(resp.data.responseData[1][0].methodology_name);
+            setMarketResponse(resp.data.responseData[1][0].market_name);
+            console.log("methodlogy", resp.data.responseData[1][0].methodology_name);
         }).catch(err => {
-            console.error("api fatch response failed",err);
-            
+            console.error("api fatch response failed", err);
+
         })
 
 
@@ -167,7 +171,7 @@ const CreateProject = () => {
                 "Methodology": formData.pmethd,
                 "Notes": formData.pnote,
                 "userId": getlocalStorage?.userId,
-                "ProjUsers": []
+                "ProjUsers": filterParams
             };
 
             apiInstace.post(Api_url + CREATE_PROJECT, payload).then((resp) => {
@@ -224,20 +228,27 @@ const CreateProject = () => {
                 <div className="row">
                     <div className="col-sm-6">
                         <label> Market </label>
+
                         <select className="w-100 form-control" name="pmarket" value={formData.pmarket} onChange={handleInputs}>
-                            <option value={1}> One </option>
-                            <option value={2}> Two </option>
-                            <option value={3}> Three </option>
+                            <option value={''} selected> Please Select a Market </option>
+
+                            {getMarket.map(item => (
+                                <option key={item.id} value={item}> {item} </option>
+                            ))}
                         </select>
+
+
                     </div>
                     {getError.pmarket && <span className="text-danger">{getError.pmarket}</span>}
 
                     <div className="col-sm-6">
                         <label> Methodology </label>
                         <select className="w-100 form-control" name="pmethd" value={formData.pmethd} onChange={handleInputs}>
-                            <option value={1}> One </option>
-                            <option value={2}> Two </option>
-                            <option value={3}> Three </option>
+                            <option value={''}> Please select methodlogy </option>
+                            
+                            {getMethodlogy.map(item => (
+                                <option key={item.id} value={item}> {item} </option>
+                            ))}
                         </select>
                     </div>
                     {getError.pmethd && <span className="text-danger">{getError.pmethd}</span>}
