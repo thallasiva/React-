@@ -14,3 +14,13 @@ td {
     padding: 6px;
 
 }
+.itemList {
+    border: 1px solid #000;
+    border-radius: 10px;
+    height: 100px;
+}
+
+.bnt-primary {
+    background-color: aqua;
+    border-radius: 8px;
+}

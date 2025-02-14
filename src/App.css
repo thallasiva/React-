@@ -1,4 +1,3 @@
-
 * {
   box-sizing: border-box;
 }
@@ -22,7 +21,7 @@ header {
 nav {
   float: left;
   width: 10%;
- height: 100vh;
+  height: 100vh;
   background: #ccc;
   padding: 20px;
   margin-top: 0%;
@@ -39,7 +38,8 @@ article {
   padding: 20px;
   width: 90%;
   background-color: #f1f1f1;
-  height: 100vh; /* only for demonstration, should be removed */
+  height: 100vh;
+  /* only for demonstration, should be removed */
 }
 
 /* Clear floats after the columns */
@@ -64,7 +64,9 @@ footer {
 
 /* Responsive layout - makes the two columns/boxes stack on top of each other instead of next to each other, on small screens */
 @media (max-width: 600px) {
-  nav, article {
+
+  nav,
+  article {
     width: 100%;
     height: auto;
   }
@@ -114,3 +116,12 @@ label {
 ::placeholder {
   font-size: 12px;
 }
+
+.itemList {
+  border: 1px solid #000;
+  border-radius: 10px;
+  height: 100px;
+  padding: 8px;
+  font-size: 12px;
+}
+

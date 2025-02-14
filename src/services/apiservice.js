@@ -9,3 +9,4 @@ export const CREATE_USER = '/api/login/registration';
 export const DELETE_USER = '/api/project/request';
 export const CREATE_PROJECT = '/api/project/create';
 export const GET_PROJECTS_LIST = '/api/project/getProjects'; 
+export const SELECTED_PROJECT_USERS = '/api/project/projectIdwise';
