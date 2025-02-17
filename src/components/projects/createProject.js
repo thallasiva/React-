@@ -54,9 +54,6 @@ const CreateProject = () => {
     const [getMethodlogy, ssetMethodlyResponse] = useState([]);
     const [getMarket, setMarketResponse] = useState([]);
 
-
-
-
     useEffect(() => {
         const otpResponse = JSON.parse(localStorage.getItem("otpValidateResponse"));
         setLocalstorage(otpResponse.data.responseData[1][0]);

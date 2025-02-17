@@ -124,4 +124,8 @@ label {
   padding: 8px;
   font-size: 12px;
 }
-
+.w-200 {
+  width: 20% !important;
+  border: none;
+  background-color: transparent;
+}

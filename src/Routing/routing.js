@@ -8,6 +8,7 @@ import CreateUser from '../components/users/createUsers';
 import ProjectList from '../components/projects/projectsList';
 import CreateProject from '../components/projects/createProject';
 import EditProject from '../components/projects/editProject';
+import ViewProject from '../components/projects/viewProject';
 
 const Routing = () => {
     return (
@@ -21,13 +22,13 @@ const Routing = () => {
                     {/* dashboard routes */}
                     <Route path='/dashboard' element={<Dashboard />} />
                     <Route path='/users/usersList' element={<UserList />} />
-                    <Route path='/users/createUser' element={<CreateUser />} /> 
+                    <Route path='/users/createUser' element={<CreateUser />} />
 
                     {/* projects list */}
                     <Route path='/projects/projectsList' element={<ProjectList />} />
                     <Route path='/projects/createProject' element={<CreateProject />} />
-                    <Route path="/projects/editProject"  element={<EditProject />} />
-
+                    <Route path="/projects/editProject" element={<EditProject />} />
+                    <Route path='/projects/viewProject' element={<ViewProject />} />
                 </Routes>
             </div>
         </Router>

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import apiInstance from "../../interceptor/axiosInstance";
-import { Api_url, GET_PROJECTS_LIST } from "../../services/apiservice";
+import { Api_url, EDIT_OR_DELETE_PROJECTS, GET_PROJECTS_LIST } from "../../services/apiservice";
 
 const ProjectList = () => {
 
@@ -43,6 +43,37 @@ const ProjectList = () => {
             })
     }
 
+    const deleteProject = (selectedProject) => {
+        console.log("selectedProject", selectedProject);
+
+        let payload = {
+            "ProjName": selectedProject.projectName,
+            "ProjDesc": selectedProject.projectDescription,
+            "ProjStatus": "Deleted",
+            "StartDate": selectedProject.startDate,
+            "EndDate": selectedProject.endDate,
+            "Market": selectedProject.market,
+            "Methodology": selectedProject.methodology,
+            "Notes": selectedProject.notes,
+            "userId": otpValidateResponse.data.responseData[1][0].userId,
+            "ProjId": selectedProject.projectId
+        }
+
+        apiInstance.post(Api_url + EDIT_OR_DELETE_PROJECTS, payload).then((resp) => {
+
+            if(resp.data.responseCode === 1) {
+                alert("Invalid request")
+            }else {
+                alert("project deleted successfully");
+                getProjectsList();
+            }
+        }).catch(err => {
+            console.error("error occured", err);
+
+        })
+
+    }
+
     const getProjectButtonStyle = (buttonStatus) => {
         switch (buttonStatus) {
             case "Draft":
@@ -71,7 +102,7 @@ const ProjectList = () => {
 
     const editProjectDetails = (selectedProjectDetails) => {
         console.log("selectedProjectDetails", selectedProjectDetails);
-        navigate('/projects/editProject', { state: { project: selectedProjectDetails } });
+        navigate('/projects/viewProject', { state: { project: selectedProjectDetails } });
     };
 
     return (
@@ -103,11 +134,11 @@ const ProjectList = () => {
                             <td>{project.startDate}</td>
                             <td>{project.endDate}</td>
                             <td><button style={getProjectButtonStyle(project.projectStatus)} className="btn btn-success rounded-pill">
-
                                 {project.projectStatus}
-
                             </button></td>
-                            <td><button style={disbaleButtonOnStatusBased(project.projectStatus)} className="btn btn-secondary rounded-pill">Archive</button></td>
+                            <td><button style={disbaleButtonOnStatusBased(project.projectStatus)} className="btn btn-secondary rounded-pill">Archive</button>
+                                <button type="button" className="btn btn-primary rounded-pill ms-3" onClick={() => deleteProject(project)}> Delete Button </button>
+                            </td>
                         </tr>
                     ))}
                 </tbody>
