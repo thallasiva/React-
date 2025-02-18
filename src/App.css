@@ -129,3 +129,11 @@ label {
   border: none;
   background-color: transparent;
 }
+
+.membersList {
+  background-color: red;
+  color: #fff;
+  padding: 8px;
+  border-radius: 50px;
+  text-align: center;
+}
