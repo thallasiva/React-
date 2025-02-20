@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import apiInstace from "../../interceptor/axiosInstance";
-import { Api_url, SELECTED_PROJECT_USERS, USERS_LIST } from "../../services/apiservice";
+import { Api_url, PROJECT_USER_CONFIG_EDIT, SELECTED_PROJECT_USERS, USERS_LIST } from "../../services/apiservice";
 
-const EditProject = () => {
+const EditProject = ({ project }) => {
     const location = useLocation();
-    const { project } = location.state || {};
+    // const { project } = location.state || {};
     const [getlocalStorage, setLocalstorage] = useState(null);
+    const [assingProjectMemberList, setAssignMember] = useState([]);
 
     const errorsMessage = {
         endDate: '',
@@ -47,6 +48,9 @@ const EditProject = () => {
     useEffect(() => {
         const otpResponse = JSON.parse(localStorage.getItem("otpValidateResponse"));
         setLocalstorage(otpResponse.data.responseData[1][0]);
+
+        console.log("project details here", project);
+
     }, []);
 
     useEffect(() => {
@@ -133,10 +137,8 @@ const EditProject = () => {
 
         apiInstace.post(Api_url + SELECTED_PROJECT_USERS, payload).then((resp) => {
             console.log("response", resp.data.responseData[2][0].project_Users);
-            const filterRecordsBasedOnYes = resp.data.responseData[2][0].project_Users.filter((selectedObj, index, list) => {
-                return selectedObj.status === 'Yes' &&
-                    list.findIndex(listObj => listObj === selectedObj) === index;
-            });
+            setAssignMember(resp.data.responseData[2][0].project_Users)
+            const filterRecordsBasedOnYes = resp.data.responseData[2][0].project_Users.filter(selectedObj => selectedObj.status === 'Yes');
             console.log("Filtered Users: ", filterRecordsBasedOnYes);
             selectedUsers(filterRecordsBasedOnYes);
         }).catch(err => {
@@ -151,6 +153,49 @@ const EditProject = () => {
         // Optionally, navigate to another page or reset state
         console.log("Form reset");
     };
+
+    // modal change
+
+    const handleCheckboxChange = (e, selectedItem) => {
+        // If checkbox is selected, set the status of the selected user to 'Yes'
+        const updatedProjectUsers = assingProjectMemberList.map((user) => {
+            if (user.userId === selectedItem.userId) {
+                // If this is the selected user, set the status to "Yes"
+                return { ...user, status: e.target.checked ? 'Yes' : 'No' };
+            }
+            // If it's not the selected user, set the status to "No"
+            return { ...user, status: 'No' };
+        });
+    
+        // Log only the userId and status for each user
+        updatedProjectUsers.forEach(user => {
+            console.log(`User ID: ${user.userId}, Status: ${user.status}`);
+        });
+    
+        // Update the state with the modified list
+        setAssignMember(updatedProjectUsers);
+    };
+    
+
+
+    const editAssignMemberSave = () => {
+        let payload = {
+            "projUsers": [
+                {
+                    "projUserId": 9,
+                    "projUserStatus": "Yes"
+                }
+            ],
+            "updatedBy": "8",
+            "ProjId": 1
+        }
+
+        apiInstace.post(Api_url + PROJECT_USER_CONFIG_EDIT, payload).then((resp) => {
+            console.log("response", resp);
+        }).catch(err => {
+            console.error("error occured", err);
+        });
+    }
 
     return (
         <div className="m-4 p-4">
@@ -182,12 +227,16 @@ const EditProject = () => {
                     />
                     {errors.projectDescription && <div className="error">{errors.projectDescription}</div>}
                 </div>
-
+                {/* <button type="button" className="btn btn-primary mt-2 rounded-pill"> Assign </button> */}
+                <button type="button" class="btn btn-primary mt-2 rounded-pill" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                    Assign
+                </button>
                 <div className="form-group">
                     <label> Project Members </label>
-                    <div className="itemList">
+                    <div className="itemList d-flex ">
                         {getUsers.map(item => (
-                            <div key={item.id}>
+                            <div key={item.id} className="p-2 border m-1 rounded-pill text-center">
+                                {item.userName}<br />
                                 {item.roleName}
                             </div>
                         ))}
@@ -279,7 +328,50 @@ const EditProject = () => {
                     <button className="btn btn-primary outline ms-2" type="submit"> Update </button>
                 </div>
             </form>
-        </div>
+
+            {/* modal */}
+
+
+
+
+            <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Project Assign Members</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            {assingProjectMemberList.map((item, index) => (
+                                <div key={index} className="d-flex align-items-center">
+                                    <img
+                                        src="https://png.pngtree.com/png-vector/20191101/ourmid/pngtree-cartoon-color-simple-male-avatar-png-image_1934459.jpg"
+                                        alt="profile image"
+                                        className="imageForAssign"
+                                        style={{ width: '80px', height: '80px', marginRight: '10px' }} // Adjust size and margin
+                                    />
+                                    <div>
+                                        <div>{item.userName}</div>
+                                        <p>{item.roleName}</p>
+                                    </div>
+                                    <div className="checkbox" style={{ marginLeft: 'auto' }}>
+                                        <input type="checkbox" checked={item.status === 'Yes'}
+                                            onChange={(e) => handleCheckboxChange(e, item)} />
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary" onClick={editAssignMemberSave}>Save</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div >
+
+
     );
 };
 

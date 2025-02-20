@@ -11,3 +11,4 @@ export const CREATE_PROJECT = '/api/project/create';
 export const GET_PROJECTS_LIST = '/api/project/getProjects'; 
 export const SELECTED_PROJECT_USERS = '/api/project/projectIdwise';
 export const EDIT_OR_DELETE_PROJECTS = '/api/project/Edit';
+export const   PROJECT_USER_CONFIG_EDIT = '/api/projUsrConfigEdit'

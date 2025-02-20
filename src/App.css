@@ -137,3 +137,8 @@ label {
   border-radius: 50px;
   text-align: center;
 }
+
+.imageForAssign {
+  width: 80px;
+  height: 80px;
+}
