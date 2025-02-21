@@ -17,7 +17,7 @@ const EditProject = ({ project }) => {
         projectDescription: '',
         projectName: '',
         startDate: '',
-    }
+    };
 
     const formDataVa = {
         endDate: '',
@@ -27,7 +27,7 @@ const EditProject = ({ project }) => {
         projectDescription: '',
         projectName: '',
         startDate: '',
-    }
+    };
 
     const [errors, setErrors] = useState(errorsMessage);
     const [formData, setFormData] = useState(formDataVa);
@@ -76,13 +76,16 @@ const EditProject = ({ project }) => {
     const editProjectDetails = (e) => {
         e.preventDefault();
 
+        // Validate formData fields before proceeding
         const errorsMessage = Object.keys(formData).reduce((acc, field) => {
             acc[field] = validations[field](formData[field]);
             return acc;
         }, {});
 
+        // Set the error messages based on validation results
         setErrors(errorsMessage);
 
+        // Check if all error messages are empty
         if (Object.values(errorsMessage).every(err => err === "")) {
             updateProjectDetails(); // API call to update project
         } else {
@@ -154,8 +157,6 @@ const EditProject = ({ project }) => {
         console.log("Form reset");
     };
 
-    // modal change
-
     const handleCheckboxChange = (e, selectedItem) => {
         // If checkbox is selected, set the status of the selected user to 'Yes'
         const updatedProjectUsers = assingProjectMemberList.map((user) => {
@@ -166,17 +167,15 @@ const EditProject = ({ project }) => {
             // If it's not the selected user, set the status to "No"
             return { ...user, status: 'No' };
         });
-    
+
         // Log only the userId and status for each user
         updatedProjectUsers.forEach(user => {
             console.log(`User ID: ${user.userId}, Status: ${user.status}`);
         });
-    
+
         // Update the state with the modified list
         setAssignMember(updatedProjectUsers);
     };
-    
-
 
     const editAssignMemberSave = () => {
         let payload = {
@@ -195,7 +194,7 @@ const EditProject = ({ project }) => {
         }).catch(err => {
             console.error("error occured", err);
         });
-    }
+    };
 
     return (
         <div className="m-4 p-4">
@@ -227,10 +226,11 @@ const EditProject = ({ project }) => {
                     />
                     {errors.projectDescription && <div className="error">{errors.projectDescription}</div>}
                 </div>
-                {/* <button type="button" className="btn btn-primary mt-2 rounded-pill"> Assign </button> */}
-                <button type="button" class="btn btn-primary mt-2 rounded-pill" data-bs-toggle="modal" data-bs-target="#exampleModal">
+
+                <button type="button" className="btn btn-primary mt-2 rounded-pill" data-bs-toggle="modal" data-bs-target="#exampleModal">
                     Assign
                 </button>
+
                 <div className="form-group">
                     <label> Project Members </label>
                     <div className="itemList d-flex ">
@@ -325,14 +325,11 @@ const EditProject = ({ project }) => {
 
                 <div className="d-flex justify-content-center mt-4">
                     <button className="btn btn-danger" type="button" onClick={handleCancel}> Cancel </button>
-                    <button className="btn btn-primary outline ms-2" type="submit"> Update </button>
+                    <button className="btn btn-primary outline ms-2" type="submit" > Update </button>
                 </div>
             </form>
 
             {/* modal */}
-
-
-
 
             <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                 <div class="modal-dialog">
@@ -348,7 +345,7 @@ const EditProject = ({ project }) => {
                                         src="https://png.pngtree.com/png-vector/20191101/ourmid/pngtree-cartoon-color-simple-male-avatar-png-image_1934459.jpg"
                                         alt="profile image"
                                         className="imageForAssign"
-                                        style={{ width: '80px', height: '80px', marginRight: '10px' }} // Adjust size and margin
+                                        style={{ width: '80px', height: '80px', marginRight: '10px' }}
                                     />
                                     <div>
                                         <div>{item.userName}</div>
@@ -369,9 +366,7 @@ const EditProject = ({ project }) => {
                     </div>
                 </div>
             </div>
-        </div >
-
-
+        </div>
     );
 };
 

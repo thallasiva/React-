@@ -3,6 +3,7 @@ import { data, useLocation } from "react-router-dom";
 import { Api_url, SELECTED_PROJECT_USERS } from "../../services/apiservice";
 import apiInstace from "../../interceptor/axiosInstance";
 import EditProject from "./editProject";
+import FilesUpload from "./filesUpload";
 const ViewProject = () => {
 
     const location = useLocation();
@@ -39,7 +40,7 @@ const ViewProject = () => {
     const selectProjectButtonStyle = (selectedProject) => {
         console.log("Selected project details", selectedProject);
         setSelectedProject(selectedProject.name); // Correct way to update state
-    
+
     }
 
 
@@ -117,6 +118,19 @@ const ViewProject = () => {
                 </div>
             )}
 
+            {/* {selectedProjectName === 'Files' && (
+                <div>
+                    <FilesUpload></FilesUpload>
+                </div>
+            )} */}
+
+            {selectedProjectName === 'Files' && (
+                <div>
+                    {/* <EditProject project={project} ></EditProject> */}
+                    <FilesUpload project={project}></FilesUpload>
+                    {/* <p>Edit Project Details</p> */}
+                </div>
+            )}
         </div>
     )
 

@@ -9,6 +9,7 @@ import ProjectList from '../components/projects/projectsList';
 import CreateProject from '../components/projects/createProject';
 import EditProject from '../components/projects/editProject';
 import ViewProject from '../components/projects/viewProject';
+import FilesUpload from '../components/projects/filesUpload';
 
 const Routing = () => {
     return (
@@ -28,6 +29,7 @@ const Routing = () => {
                     <Route path='/projects/projectsList' element={<ProjectList />} />
                     <Route path='/projects/createProject' element={<CreateProject />} />
                     <Route path="/projects/editProject" element={<EditProject />} />
+                    <Route path="/projects/file-upload" element={<FilesUpload />} />
                     <Route path='/projects/viewProject' element={<ViewProject />} />
                 </Routes>
             </div>
