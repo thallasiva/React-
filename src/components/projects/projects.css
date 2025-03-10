@@ -24,3 +24,7 @@ td {
     background-color: aqua;
     border-radius: 8px;
 }
+.imageIcon {
+    width: 100px;
+    height: 100px;
+}
